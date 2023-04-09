@@ -5,8 +5,10 @@ const { PORT } = require('./util/config')
 const { connectToDatabase } = require('./util/db')
 
 const blogsRouter = require('./controllers/blogs')
+const middleware = require('./util/middleware');
 
 app.use(express.json())
+app.use(middleware.blogFinder);
 
 app.use('/api/blogs', blogsRouter)
 
