@@ -5,41 +5,56 @@ const app = express()
 
 const sequelize = new Sequelize(process.env.DATABASE_URL);
 
-class Note extends Model {}
-Note.init({
+class Blog extends Model {}
+Blog.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  content: {
+  author: {
+    type: DataTypes.TEXT
+  },
+  url: {
     type: DataTypes.TEXT,
     allowNull: false
   },
-  important: {
-    type: DataTypes.BOOLEAN
+  title: {
+    type: DataTypes.DATE,
+    allowNull: false
   },
-  date: {
-    type: DataTypes.DATE
+  likes: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
   }
 }, {
   sequelize,
   underscored: true,
   timestamps: false,
-  modelName: 'note'
+  modelName: 'blog'
 })
 
 app.use(express.json())
 
-app.get('/api/notes', async (req, res) => {
-  const notes = await Note.findAll()
-  res.json(notes)
+app.get('/api/blogs', async (req, res) => {
+  const blogs = await Blog.findAll()
+  res.json(blogs)
 })
 
-app.post('/api/notes', async (req, res) => {
+app.post('/api/blogs', async (req, res) => {
   try {
-    const note = await Note.create(req.body)
-    return res.json(note)
+    const blog = await Blog.create(req.body)
+    return res.json(blog)
+  } catch(error) {
+    return res.status(400).json({ error })
+  }
+})
+
+app.delete('/api/blogs/:id', async (req, res) => {
+  const blogId = req.params.id
+  try {
+    const blogDestroyed = await Blog.destroy({where: {id: blogId}}) 
+    res.json(blogDestroyed)
   } catch(error) {
     return res.status(400).json({ error })
   }
