@@ -17,7 +17,10 @@ User.init(
         },
         username: {
             type: DataTypes.TEXT,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                is:/^\S+@\S+\.\S+$/
+            }
         }
     },
     {

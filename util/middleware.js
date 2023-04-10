@@ -5,6 +5,15 @@ const blogFinder = async (req, res, next) => {
     next()
 }
 
+const errorHandler = (error, _, response, next) => {
+    console.error(error.message);
+    if (error.name === 'SequelizeValidationError') {
+        return response.status(400).json({ error: error.message });
+    }
+    next(error)
+}
+
 module.exports = {
-    blogFinder
+    blogFinder,
+    errorHandler
 }

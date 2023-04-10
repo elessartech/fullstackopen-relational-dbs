@@ -9,6 +9,7 @@ const middleware = require('./util/middleware');
 
 app.use(express.json())
 app.use(middleware.blogFinder);
+app.use(middleware.errorHandler);
 
 app.use('/api/blogs', blogsRouter)
 
