@@ -1,18 +1,46 @@
 const router = require('express').Router()
+const { Op } = require('sequelize');
+
 
 const { Blog, User } = require('../models')
 const middleware = require('../util/middleware');
 
 router.get('/', async (req, res) => {
-    const blogs = await Blog.findAll({
-        attributes: { excluse: ['userId' ]},
-        include: {
-          model: User,
-          attributes: ['name']
+    try {
+        let where = {};
+        const search = req.query.search;
+        if (search) {
+        where = {
+            [Op.or]: [
+              {
+                title: { [Op.iLike]: `%${req.query.search}%` }
+              },
+              {
+                author: { [Op.iLike]: `%${req.query.search}%` }
+              }
+            ]
+          };
         }
-    });
-    res.json(blogs)
-})
+
+        const blogs = await Blog.findAll({
+            attributes: { exclude: ['userId'] },
+            include: {
+                model: User,
+                attributes: ['name']
+            },
+            where,
+            order: [
+                ['likes', 'DESC'],
+              ],
+            });
+
+        res.json(blogs);
+    } catch (error) {
+        console.error('Error fetching blogs:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
   
 router.post('/', middleware.tokenVerifier, async (req, res) => {
     try {
