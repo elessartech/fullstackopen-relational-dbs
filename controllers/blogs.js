@@ -1,23 +1,37 @@
 const router = require('express').Router()
 
-const { Blog } = require('../models')
+const { Blog, User } = require('../models')
+const middleware = require('../util/middleware');
 
 router.get('/', async (req, res) => {
-    const blogs = await Blog.findAll()
+    const blogs = await Blog.findAll({
+        attributes: { excluse: ['userId' ]},
+        include: {
+          model: User,
+          attributes: ['name']
+        }
+    });
     res.json(blogs)
 })
   
-router.post('/', async (req, res) => {
+router.post('/', middleware.tokenVerifier, async (req, res) => {
     try {
-        const blog = await Blog.create(req.body)
+        const user = await User.findByPk(req.user.id);
+        const blog = await Blog.create({ ...req.body, userId: user.id });
         return res.json(blog)
     } catch(error) {
         return res.status(400).json({ error })
     }
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', middleware.tokenVerifier, async (req, res) => {
     const blog = await Blog.findByPk(req.params.id)
+    if (!blog) {
+        return res.status(404).end()
+    }
+    if (req.user.id !== blog.userId) {
+      return res.status(401).json({ error: 'unauthorized' })
+    }
     if (blog) {
       await blog.destroy()
     }
@@ -25,13 +39,15 @@ router.delete('/:id', async (req, res) => {
 })
 
 router.put('/:id', async (req, res) => {
-    if (req.blog) {
-        req.blog.likes = req.body.likes
-        await req.blog.save()
-        res.json(req.blog)
-      } else {
-        res.status(404).end()
+    const blog = await Blog.findByPk(req.params.id);
+    if (blog) {
+        blog.likes += 1;
+        await blog.save();
+        res.json(blog);
+    } else {
+        res.status(404).end();
     }
-})
+});
+
 
 module.exports = router

@@ -18,16 +18,26 @@ User.init(
         username: {
             type: DataTypes.TEXT,
             allowNull: false,
+            unique: true,
             validate: {
-                is:/^\S+@\S+\.\S+$/
+                isEmail: true
             }
+        },
+        passwordHash: {
+            type: DataTypes.STRING,
+            allowNull: false
         }
     },
     {
         sequelize,
         underscored: true,
         timestamps: true,
-        modelName: 'user'
+        modelName: 'user',
+        scopes: {
+            withoutPassword: {
+              attributes: { exclude: ['passwordHash'] },
+            },
+          },
     })
 
 module.exports = User
