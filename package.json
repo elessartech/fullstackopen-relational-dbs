@@ -1,10 +1,16 @@
 {
+  "scripts": {
+    "dev": "nodemon index.js",
+    "migration:down": "node util/rollback.js"
+  },
   "dependencies": {
     "bcrypt": "^5.1.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.7",
     "pg": "^8.10.0",
-    "sequelize": "^6.30.0"
+    "sequelize": "^6.30.0",
+    "umzug": "^3.8.2"
   }
 }

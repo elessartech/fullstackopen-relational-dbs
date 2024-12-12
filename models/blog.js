@@ -29,11 +29,17 @@ Blog.init({
       type: DataTypes.INTEGER,
       allowNull: false,
       references: { model: 'users', key: 'id' },
-    }
+    },
+    year: {
+      type: DataTypes.INTEGER,
+      validate: {
+        min: 1991,
+        max: new Date().getFullYear(),
+      },
+    },
   }, {
     sequelize,
     underscored: true,
-    timestamps: false,
     modelName: 'blog'
   })
 
