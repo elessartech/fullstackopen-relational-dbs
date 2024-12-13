@@ -1,5 +1,6 @@
 const { Blog } = require('../models/index')
 const { SECRET } = require('./config')
+const jwt = require('jsonwebtoken')
 
 const blogFinder = async (req, res, next) => {
     req.blog = await Blog.findByPk(req.params.id)
@@ -29,10 +30,11 @@ const tokenExtractor = (req, res, next) => {
 };
 
 const tokenVerifier = (req, res, next) => {
-    if (!req.token) {
+    const token = req.query.token;
+    if (!token) {
         return res.status(401).json({ error: 'token missing' });
     }
-    req.user = jwt.verify(req.token, SECRET);
+    req.user = jwt.verify(token, SECRET);
     next();
 };
 

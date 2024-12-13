@@ -15,7 +15,19 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/:id', async(req, res) => {
-    const user = await User.scope('withoutPassword').findByPk(req.params.id);
+    const where = req.query.read ? { read: req.query.read === 'true' } : undefined
+    const user = await User.scope('withoutPassword').findByPk(req.params.id, {
+        include: [{
+          model: Blog,
+          as: 'readings',
+          attributes: { exclude: ['userId', 'createdAt', 'updatedAt'] },
+          through: {
+            attributes: ['id', 'read'],
+            as: 'readinglists',
+            where
+          },
+        }],
+    })
     if (user) {
         return res.json(user)
     } else {

@@ -18,7 +18,7 @@ Blog.init({
       allowNull: false
     },
     title: {
-      type: DataTypes.DATE,
+      type: DataTypes.TEXT,
       allowNull: false
     },
     likes: {
@@ -32,6 +32,7 @@ Blog.init({
     },
     year: {
       type: DataTypes.INTEGER,
+      allowNull: true,
       validate: {
         min: 1991,
         max: new Date().getFullYear(),
